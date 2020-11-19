@@ -1,0 +1,14 @@
+# dependencies
+/node_modules
+# testing
+/coverage
+# misc
+dist
+.DS_Store
+.env.local
+.env.*.local
+npm-debug.log*
+# Editor directories and files
+.vscode
+.babel*
+*.snap
