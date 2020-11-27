@@ -87,7 +87,7 @@ describe('USER-RATINGS TESTS', () => {
             ]
         }
         fetch.mockResponse(JSON.stringify(expectedResponse));
-        const current = await api.listRatings(1);
+        const current = await api.listRatings(1, "Q21vU1pHb1FjSEp...");
     
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();

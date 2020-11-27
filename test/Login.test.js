@@ -40,7 +40,7 @@ describe('LOGIN TESTS', () => {
             }
         }
         fetch.mockResponse(JSON.stringify(expectedResponse));
-        const current = await api.loginService('serviceAccountNode', 'MyP@ssw0rd', 'wSSZQbPxKvBrk_n3H_m6ZA');
+        const current = await api.loginService('serviceAccountNode', 'MyP@ssw0rd', 'wSSZQbPxKvBrk_n3H_m6ZA', 'frontend_user_id_test');
     
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -76,22 +76,4 @@ describe('LOGIN TESTS', () => {
         expect(current).toMatchSnapshot();
       });
   
-      test('AuthError', async () => {
-        const expectedError = {
-          error_code: 21,
-          error_name: 'AuthError',
-          message: 'Cannot perform authentication: account password is incorrect',
-          error_data: {
-            error: 'account password is incorrect',
-            name: 'INCORRECT_PASSWORD'
-          }
-        }
-        const theSpiedMethod = jest.spyOn(api, 'loginIndividual');
-        when(theSpiedMethod)
-          .calledWith('reject@hotmail.com', 'MyP@ssw0rd1', '3_kpGNbqBbE_xPtKTg8fwA')
-          .mockRejectedValueOnce(new AuthError(expectedError));
-        const returnValue = api.loginIndividual('reject@hotmail.com', 'MyP@ssw0rd1', '3_kpGNbqBbE_xPtKTg8fwA');
-        expect(returnValue).rejects.toThrow(AuthError);
-      });
-
 });
