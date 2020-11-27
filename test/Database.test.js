@@ -9,7 +9,7 @@ describe('DATABASE TESTS', () => {
     test('createDatabase', async () => {
       const expectedResponse = { "id": "wSSZQbPxKvBrk_n2B_m6ZA" }
       fetch.mockResponse(JSON.stringify(expectedResponse));
-      const current = await api.createIndividualAccount("Example DB name", "Example DB longer description", "uuid", "uint32");
+      const current = await api.createDatabase("Example DB name", "Example DB longer description", "uuid", "uint32");
   
       expect(current).toEqual(expectedResponse);
       expect(current).toMatchSnapshot();
