@@ -1,10 +1,20 @@
-const fetch = require('jest-fetch-mock');
-jest.setMock('node-fetch', fetch);
+require('jest-fetch-mock');
+const fetchMock = require('fetch-mock');
+jest.setMock('node-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
+const querystring = require('querystring');
+const utils = require('../lib/Utils');
 
 // RECOMMENDATIONS ENDPOINTS
 describe('RECOMMENDATIONS TESTS', () => {
-    const api = ApiClient.instance;
+    const host = "http://localhost";
+    const api = new ApiClient(host);
+    const headers = {
+        'User-Agent': 'CrossingMinds/v1',
+        'Content-type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Bearer '
+    }
   
     test('getRecommendationsItemToItems', async () => {
         const expectedResponse = {
@@ -19,9 +29,16 @@ describe('RECOMMENDATIONS TESTS', () => {
             {"property_name": "genres", "op": "eq", "value": "drama"}
         ]
         const amt = 10;
-        fetch.mockResponse(JSON.stringify(expectedResponse));
+        let queryParams = {};
+        queryParams['amt'] = amt;
+        queryParams['cursor'] = 'Q21vU1pHb1FjSEp...';
+        queryParams['filters'] = utils.getFormattedFiltersArray(filters);
+        let path = '/recommendation/items/c3391d83-553b-40e7-818e-fcf658ec397d/items/' +
+            (JSON.stringify(queryParams) !== {}
+            ? ('?' + querystring.stringify(queryParams))
+            : '');
+        fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
         const current = await api.getRecommendationsItemToItems("c3391d83-553b-40e7-818e-fcf658ec397d", filters, amt, "Q21vU1pHb1FjSEp...");
-    
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });
@@ -50,9 +67,8 @@ describe('RECOMMENDATIONS TESTS', () => {
             {"property_name": "poster", "op": "notempty"},
         ]
         const excludeRatedItems = true;
-        fetch.mockResponse(JSON.stringify(expectedResponse));
+        fetchMock.postOnce(host + '/recommendation/sessions/items/', expectedResponse, { headers: headers });
         const current = await api.getRecommendationsSessionToItems(ratings, userProperties, filters, excludeRatedItems, amt, "Q21vU1pHb1FjSEp...");
-    
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });
@@ -78,9 +94,17 @@ describe('RECOMMENDATIONS TESTS', () => {
         ]
         const userId = "c3391d83-553b-40e7-818e-fcf658ec397d";
         const excludeRatedItems = true;
-        fetch.mockResponse(JSON.stringify(expectedResponse));
+        let queryParams = {};
+        queryParams['amt'] = amt;
+        queryParams['cursor'] = 'Q21vU1pHb1FjSEp...';
+        queryParams['filters'] = utils.getFormattedFiltersArray(filters);
+        queryParams['exclude_rated_items'] = excludeRatedItems;
+        let path = `/recommendation/users/${userId}/items/` +
+        (JSON.stringify(queryParams) !== {}
+            ? ('?' + querystring.stringify(queryParams))
+            : '');
+        fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
         const current = await api.getRecommendationsUserToItems(userId, filters, excludeRatedItems, amt, "Q21vU1pHb1FjSEp...");
-    
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
       });

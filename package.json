@@ -2,13 +2,12 @@
   "name": "xminds-nodejs",
   "version": "1.0.0",
   "description": "Node.JS client for Crossing Minds B2B API",
-  "main": "index.js",
+  "main": "lib/ApiClient.js",
   "repository": {
     "type": "git",
     "url": "git@git.crossingminds.org:opensource/xminds-nodejs.git"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node index.js",
     "test": "jest"
   },
   "author": "Julio Briceno",
@@ -23,7 +22,7 @@
     "@babel/node": "^7.12.6",
     "jest": "^26.6.3",
     "jest-fetch-mock": "^3.0.3",
-    "jest-when": "^3.0.1",
+    "fetch-mock": "^9.11.0",
     "nodemon": "^2.0.3"
   }
 }
