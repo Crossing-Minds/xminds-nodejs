@@ -238,3 +238,5 @@ client.listUserRatings(userId, page, amount)
 ## Documentation
 
 [API documentation](https://docs.api.crossingminds.com/index.html)
+
+Release version 1.1.0
