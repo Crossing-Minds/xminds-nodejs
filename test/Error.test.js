@@ -1,7 +1,7 @@
 require('jest-fetch-mock');
 const { ApiClient } = require("../lib/ApiClient");
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
 const { parseError, AuthError, JwtTokenExpiredError,
   DuplicatedError, TooManyRequestsError, RefreshTokenExpiredError,
   WrongDataError, ForbiddenError, NotFoundError, MethodNotAllowedError,
@@ -162,8 +162,8 @@ describe('ERRORS TESTS', () => {
 
   test('listAllDatabases should throw a ServerError', async () => {
     const serverErrorResponse = new Response('{"error_code": "0", "message": "Internal Server Error"}', { status: 500 });
-    fetchMock.getOnce(host + '/databases/', serverErrorResponse, { headers: headers });
-    const current = api.listAllDatabases().catch(err => {
+    fetchMock.getOnce(host + '/databases/?amt=64&page=1', serverErrorResponse, { headers: headers });
+    api.listAllDatabases(64, 1).catch(err => {
       expect(err.message).toEqual('Internal Server Error');
     });
   });

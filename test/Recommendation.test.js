@@ -1,8 +1,7 @@
 require('jest-fetch-mock');
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
-const querystring = require('querystring');
 const utils = require('../lib/Utils');
 
 // RECOMMENDATIONS ENDPOINTS
@@ -15,7 +14,7 @@ describe('RECOMMENDATIONS TESTS', () => {
         Accept: 'application/json',
         Authorization: 'Bearer '
     }
-  
+
     test('getRecommendationsItemToItems', async () => {
         const expectedResponse = {
             "items_id": [
@@ -25,8 +24,8 @@ describe('RECOMMENDATIONS TESTS', () => {
             "next_cursor": "HLe-e1Sq..."
         }
         const filters = [
-            {"property_name": "price", "op": "lt", "value": 10},
-            {"property_name": "genres", "op": "eq", "value": "drama"}
+            { "property_name": "price", "op": "lt", "value": 10 },
+            { "property_name": "genres", "op": "eq", "value": "drama" }
         ]
         const amt = 10;
         let queryParams = {};
@@ -35,8 +34,8 @@ describe('RECOMMENDATIONS TESTS', () => {
         queryParams['filters'] = utils.getFormattedFiltersArray(filters);
         let path = '/recommendation/items/c3391d83-553b-40e7-818e-fcf658ec397d/items/' +
             (JSON.stringify(queryParams) !== {}
-            ? ('?' + querystring.stringify(queryParams))
-            : '');
+                ? ('?' + utils.convertToQueryString(queryParams))
+                : '');
         fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
         const current = await api.getRecommendationsItemToItems("c3391d83-553b-40e7-818e-fcf658ec397d", filters, amt, "Q21vU1pHb1FjSEp...");
         expect(current).toEqual(expectedResponse);
@@ -52,8 +51,8 @@ describe('RECOMMENDATIONS TESTS', () => {
             "next_cursor": "HLe-e1Sq..."
         }
         const ratings = [
-            {"item_id": "123e4567-e89b-12d3-a456-426614174000", "rating": 8.5},
-            {"item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "rating": 2.0}
+            { "item_id": "123e4567-e89b-12d3-a456-426614174000", "rating": 8.5 },
+            { "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "rating": 2.0 }
         ]
         const userProperties = {
             "subscriptions": ["channel1", "channel2"],
@@ -61,10 +60,10 @@ describe('RECOMMENDATIONS TESTS', () => {
         }
         const amt = 10;
         const filters = [
-            {"property_name": "price", "op": "lt", "value": 10},
-            {"property_name": "genres", "op": "eq", "value": "drama"},
-            {"property_name": "tags", "op": "in", "value": ["family", "fiction"]},
-            {"property_name": "poster", "op": "notempty"},
+            { "property_name": "price", "op": "lt", "value": 10 },
+            { "property_name": "genres", "op": "eq", "value": "drama" },
+            { "property_name": "tags", "op": "in", "value": ["family", "fiction"] },
+            { "property_name": "poster", "op": "notempty" },
         ]
         const excludeRatedItems = true;
         fetchMock.postOnce(host + '/recommendation/sessions/items/', expectedResponse, { headers: headers });
@@ -73,7 +72,7 @@ describe('RECOMMENDATIONS TESTS', () => {
         expect(current).toMatchSnapshot();
     });
 
-      test('getRecommendationsUserToItems', async () => {
+    test('getRecommendationsUserToItems', async () => {
         const expectedResponse = {
             "items_id": [
                 "c3391d83-553b-40e7-818e-fcf658ec397d",
@@ -87,10 +86,10 @@ describe('RECOMMENDATIONS TESTS', () => {
         }
         const amt = 10;
         const filters = [
-            {"property_name": "price", "op": "lt", "value": 10},
-            {"property_name": "genres", "op": "eq", "value": "drama"},
-            {"property_name": "tags", "op": "in", "value": ["family", "fiction"]},
-            {"property_name": "poster", "op": "notempty"}
+            { "property_name": "price", "op": "lt", "value": 10 },
+            { "property_name": "genres", "op": "eq", "value": "drama" },
+            { "property_name": "tags", "op": "in", "value": ["family", "fiction"] },
+            { "property_name": "poster", "op": "notempty" }
         ]
         const userId = "c3391d83-553b-40e7-818e-fcf658ec397d";
         const excludeRatedItems = true;
@@ -100,13 +99,13 @@ describe('RECOMMENDATIONS TESTS', () => {
         queryParams['filters'] = utils.getFormattedFiltersArray(filters);
         queryParams['exclude_rated_items'] = excludeRatedItems;
         let path = `/recommendation/users/${userId}/items/` +
-        (JSON.stringify(queryParams) !== {}
-            ? ('?' + querystring.stringify(queryParams))
-            : '');
+            (JSON.stringify(queryParams) !== {}
+                ? ('?' + utils.convertToQueryString(queryParams))
+                : '');
         fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
         const current = await api.getRecommendationsUserToItems(userId, filters, excludeRatedItems, amt, "Q21vU1pHb1FjSEp...");
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
-      });
+    });
 
 });

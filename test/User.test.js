@@ -1,8 +1,8 @@
 require('jest-fetch-mock');
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
-const querystring = require('querystring');
+const utils = require('../lib/Utils');
 
 // USER-DATA-PROPERTIES ENDPOINTS
 describe('USER-DATA-PROPERTIES TESTS', () => {
@@ -128,7 +128,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
         let queryParams = {}
         queryParams['amt'] = 100;
         queryParams['cursor'] = 'Q21vU1pHb1FjSEp...';
-        let path = '/users-bulk/?' + querystring.stringify(queryParams);
+        let path = '/users-bulk/?' + utils.convertToQueryString(queryParams);
         fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
         const current = await api.listUsersPaginated(100, 'Q21vU1pHb1FjSEp...');
         expect(current).toEqual(expectedResponse);

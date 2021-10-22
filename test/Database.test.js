@@ -1,6 +1,6 @@
 require('jest-fetch-mock');
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
 
 // DATABASE ENDPOINTS
@@ -36,8 +36,8 @@ describe('DATABASE TESTS', () => {
                 }
             ]
         }
-        fetchMock.getOnce(host + '/databases/', expectedResponse, { headers: headers });
-        const current = await api.listAllDatabases();
+        fetchMock.getOnce(host + '/databases/?amt=64&page=1', expectedResponse, { headers: headers });
+        const current = await api.listAllDatabases(64, 1);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });
