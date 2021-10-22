@@ -1,7 +1,7 @@
 require('jest-fetch-mock');
 const { ApiClient } = require("../lib/ApiClient");
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
 
 // LOGIN REFRESH TOKEN 
 describe('LOGIN REFRESH TOKEN ERROR TEST', () => {
@@ -22,14 +22,14 @@ describe('LOGIN REFRESH TOKEN ERROR TEST', () => {
 
   test('Should fail because Refresh Token has expired', async () => {
     // Mock the fetch() get method for first call with an error response when called
-    fetchMock.getOnce(host + '/databases/', responseErr, { headers: headers });
+    fetchMock.getOnce(host + '/databases/?amt=64&page=1', responseErr, { headers: headers });
     // Mock the fetch() post method to return a correct response when called
     fetchMock.post(host + '/login/refresh-token/', refreshTokenExpiredError, { headers: headers });
 
-    const current = await api.listAllDatabases().catch(err => {
+    const current = await api.listAllDatabases(64, 1).catch(err => {
       expect(err.message).toEqual('The refresh token has expired');
     });
-    // Three calls must be made
+    // Two calls must be made
     expect((fetchMock._calls.length)).toEqual(2);
     // The first call should be to listAllDatabases endpoint
     expect((fetchMock._calls[0].url)).toEqual(host + '/databases/');

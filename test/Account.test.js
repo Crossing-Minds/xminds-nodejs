@@ -1,8 +1,8 @@
 require('jest-fetch-mock');
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
-const querystring = require('querystring');
+const utils = require('../lib/Utils');
 
 // ACCOUNT ENDPOINTS
 describe('ACCOUNT TESTS', () => {
@@ -41,8 +41,8 @@ describe('ACCOUNT TESTS', () => {
 
   test('verifyAccount', async () => {
     const expectedResponse = {}
-    let queryParams = {'code': 'abcd1234', 'email': 'john@example.com'}
-    let path = '/accounts/verify/?' + querystring.stringify(queryParams);
+    let queryParams = { 'code': 'abcd1234', 'email': 'john@example.com' }
+    let path = '/accounts/verify/?' + utils.convertToQueryString(queryParams);
     fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
     const current = await api.verifyAccount("abcd1234", "john@example.com");
     expect(current).toEqual(expectedResponse);

@@ -1,7 +1,7 @@
 require('jest-fetch-mock');
-const { ApiClient } = require("../lib/ApiClient");
 const fetchMock = require('fetch-mock');
-jest.setMock('node-fetch', fetchMock);
+jest.setMock('isomorphic-fetch', fetchMock);
+const { ApiClient } = require("../lib/ApiClient");
 
 // LOGIN REFRESH TOKEN 
 describe('LOGIN REFRESH TOKEN TEST', () => {
@@ -46,13 +46,13 @@ describe('LOGIN REFRESH TOKEN TEST', () => {
 
   test('Should generate a new JWTToken using the cached Refresh Token and execute again the initial method', async () => {
     // Mock the fetch() get method for first call with an error response when called
-    fetchMock.getOnce(host + '/databases/', responseErr, { headers: headers });
+    fetchMock.getOnce(host + '/databases/?amt=64&page=1', responseErr, { headers: headers });
     // Mock the fetch() post method to return a correct response when called
     fetchMock.post(host + '/login/refresh-token/', loginRefreshTokenResponse, { headers: headers });
     // Mock the fetch() get method for second call with a correct response when called
-    fetchMock.getOnce(host + '/databases/', expectedResponseOK, { overwriteRoutes: false });
+    fetchMock.getOnce(host + '/databases/?amt=64&page=1', expectedResponseOK, { overwriteRoutes: true });
 
-    const current = await api.listAllDatabases();
+    const current = await api.listAllDatabases(64, 1);
     // Three calls must be made
     expect((fetchMock._calls.length)).toEqual(3);
     // The first call should be to listAllDatabases endpoint
