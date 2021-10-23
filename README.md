@@ -31,14 +31,14 @@ npm run build
 **In Node.js**
 
 ```js
-const { ApiClient } = require("xminds-nodejs");
+const { ApiClient } = require("xminds-sdk-nodejs");
 ```
 
 ## Examples
 
 **Initializing the client**
 ```js
-import {ApiClient} from "xminds-nodejs";
+import {ApiClient} from "xminds-sdk-nodejs";
 
 // comes from the backend, and is linked to db_id and userId
 const refreshToken = "/lDHAxJIFwGg02B3Z8m1XA/RtqgoWRONGceS/kmJfe8p++50hOBJnyaqjrU8pPGmFmCvSxk6JPdxTg==";
