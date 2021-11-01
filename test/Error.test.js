@@ -5,7 +5,7 @@ jest.setMock('isomorphic-fetch', fetchMock);
 const { parseError, AuthError, JwtTokenExpiredError,
   DuplicatedError, TooManyRequestsError, RefreshTokenExpiredError,
   WrongDataError, ForbiddenError, NotFoundError, MethodNotAllowedError,
-  ServerUnavailableError, ServerError, XMindError } = require('../lib/XMindError');
+  ServerUnavailableError, ServerError, XmindsError } = require('../lib/XmindsError');
 
 // ERROR TESTS
 describe('ERRORS TESTS', () => {
@@ -146,7 +146,7 @@ describe('ERRORS TESTS', () => {
     expect(() => parseError(expectedError)).toThrowError(ServerError);
   });
 
-  test('XMindError', async () => {
+  test('XmindsError', async () => {
     const expectedError = {
       error_code: 21,
       error_name: 'AuthError',
@@ -156,7 +156,7 @@ describe('ERRORS TESTS', () => {
         name: 'INCORRECT_PASSWORD'
       }
     }
-    let error = new XMindError(expectedError);
+    let error = new XmindsError(expectedError);
     expect(error.message).toEqual('Cannot perform authentication: account password is incorrect');
   });
 
