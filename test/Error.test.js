@@ -1,23 +1,28 @@
-require('jest-fetch-mock');
 const { ApiClient } = require("../lib/ApiClient");
-const fetchMock = require('fetch-mock');
-jest.setMock('isomorphic-fetch', fetchMock);
 const { parseError, AuthError, JwtTokenExpiredError,
   DuplicatedError, TooManyRequestsError, RefreshTokenExpiredError,
   WrongDataError, ForbiddenError, NotFoundError, MethodNotAllowedError,
-  ServerUnavailableError, ServerError, XmindsError } = require('../lib/XmindsError');
+  ServerUnavailableError, ServerError } = require('../lib/XMindsError');
+const fetchMock = require('fetch-mock-jest');
 
 // ERROR TESTS
 describe('ERRORS TESTS', () => {
-  const host = "http://localhost";
-  const api = new ApiClient(host);
-  // Headers 
-  const headers = {
-    'User-Agent': 'CrossingMinds/v1',
-    'Content-type': 'application/json',
-    Accept: 'application/json',
-    Authorization: 'Bearer '
+  const opts = {
+    host: "http://localhost"
   }
+  const api = new ApiClient(opts);
+  const loginRefreshTokenResponse = {
+    "token": "eyJ0eX...",
+    "refresh_token": "mW+k/K...",
+    "database": {
+      "id": "wSSZQbPxKvBrk_n2B_m6ZA",
+      "name": "Example DB name",
+      "description": "Example DB longer description",
+      "item_id_type": "uuid",
+      "user_id_type": "uint32"
+    }
+  }
+  fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
   test('AuthError', async () => {
     const expectedError = {
@@ -146,23 +151,9 @@ describe('ERRORS TESTS', () => {
     expect(() => parseError(expectedError)).toThrowError(ServerError);
   });
 
-  test('XmindsError', async () => {
-    const expectedError = {
-      error_code: 21,
-      error_name: 'AuthError',
-      message: 'Cannot perform authentication: account password is incorrect',
-      error_data: {
-        error: 'account password is incorrect',
-        name: 'INCORRECT_PASSWORD'
-      }
-    }
-    let error = new XmindsError(expectedError);
-    expect(error.message).toEqual('Cannot perform authentication: account password is incorrect');
-  });
-
   test('listAllDatabases should throw a ServerError', async () => {
     const serverErrorResponse = new Response('{"error_code": "0", "message": "Internal Server Error"}', { status: 500 });
-    fetchMock.getOnce(host + '/databases/?amt=64&page=1', serverErrorResponse, { headers: headers });
+    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', serverErrorResponse);
     api.listAllDatabases(64, 1).catch(err => {
       expect(err.message).toEqual('Internal Server Error');
     });
