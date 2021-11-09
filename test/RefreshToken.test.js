@@ -1,23 +1,12 @@
-require('jest-fetch-mock');
-const fetchMock = require('fetch-mock');
-jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
+const fetchMock = require('fetch-mock-jest');
 
 // LOGIN REFRESH TOKEN 
 describe('LOGIN REFRESH TOKEN TEST', () => {
-
-  const host = "http://localhost";
-  const api = new ApiClient(host);
-  // Headers 
-  const headers = {
-    'User-Agent': 'CrossingMinds/v1',
-    'Content-type': 'application/json',
-    Accept: 'application/json',
-    Authorization: 'Bearer '
+  const opts = {
+    host: "http://localhost"
   }
-  // Error response for first call of listAllDatabases service
-  const responseErr = new Response('{"error_code": "22", "error_name": "JwtTokenExpired", "message": "The JWT token has expired", "error_data": { "name": "JWT_TOKEN_EXPIRED" }}', { status: 401 });
-  // Correct response of loginRefreshToken service (after first call with error)
+  const api = new ApiClient(opts);
   const loginRefreshTokenResponse = {
     "token": "eyJ0eX...",
     "refresh_token": "mW+k/K...",
@@ -29,6 +18,9 @@ describe('LOGIN REFRESH TOKEN TEST', () => {
       "user_id_type": "uint32"
     }
   }
+
+  // Error response for first call of listAllDatabases service
+  const responseErr = new Response('{"error_code": "22", "error_name": "JwtTokenExpired", "message": "The JWT token has expired", "error_data": { "name": "JWT_TOKEN_EXPIRED" }}', { status: 401 });
   // Correct response for second call of listAllDatabases service
   const expectedResponseOK = {
     "has_next": false,
@@ -46,21 +38,19 @@ describe('LOGIN REFRESH TOKEN TEST', () => {
 
   test('Should generate a new JWTToken using the cached Refresh Token and execute again the initial method', async () => {
     // Mock the fetch() get method for first call with an error response when called
-    fetchMock.getOnce(host + '/databases/?amt=64&page=1', responseErr, { headers: headers });
+    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', responseErr);
     // Mock the fetch() post method to return a correct response when called
-    fetchMock.post(host + '/login/refresh-token/', loginRefreshTokenResponse, { headers: headers });
+    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
     // Mock the fetch() get method for second call with a correct response when called
-    fetchMock.getOnce(host + '/databases/?amt=64&page=1', expectedResponseOK, { overwriteRoutes: true });
+    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', expectedResponseOK, { overwriteRoutes: true });
 
     const current = await api.listAllDatabases(64, 1);
-    // Three calls must be made
-    expect((fetchMock._calls.length)).toEqual(3);
-    // The first call should be to listAllDatabases endpoint
-    expect((fetchMock._calls[0].url)).toEqual(host + '/databases/');
+    // Two calls must be made
+    expect((fetchMock._calls.length)).toEqual(2);
     // The second call should be to loginRefreshToken endpoint
-    expect((fetchMock._calls[1].url)).toEqual(host + '/login/refresh-token/');
+    expect((fetchMock._calls[0].url)).toEqual(opts.host + '/v1/login/refresh-token/');
     // The third call should be to listAllDatabases endpoint
-    expect((fetchMock._calls[2].url)).toEqual(host + '/databases/');
+    expect((fetchMock._calls[1].url)).toEqual(opts.host + '/v1/databases/?amt=64&page=1');
     // The final response must be as expected
     expect(current).toEqual(expectedResponseOK);
     expect(current).toMatchSnapshot();

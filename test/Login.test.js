@@ -1,18 +1,12 @@
-require('jest-fetch-mock');
-const fetchMock = require('fetch-mock');
-jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
+const fetchMock = require('fetch-mock-jest');
 
 // LOGIN ENDPOINTS
 describe('LOGIN TESTS', () => {
-  const host = "http://localhost";
-  const api = new ApiClient(host);
-  const headers = {
-    'User-Agent': 'CrossingMinds/v1',
-    'Content-type': 'application/json',
-    Accept: 'application/json',
-    Authorization: 'Bearer '
+  const opts = {
+    host: "http://localhost"
   }
+  const api = new ApiClient(opts);
 
   test('loginIndividual', async () => {
     const expectedResponse = {
@@ -26,7 +20,7 @@ describe('LOGIN TESTS', () => {
         user_id_type: "uint32"
       }
     }
-    fetchMock.postOnce(host + '/login/individual/', expectedResponse, { headers: headers });
+    fetchMock.postOnce(opts.host + '/v1/login/individual/', expectedResponse);
     const current = await api.loginIndividual('john@example.com', 'MyP@ssw0rd', 'wSSZQbPxKvBrk_n2B_m6ZA', 'test');
     expect(current).toEqual(expectedResponse);
     let jwtToken = api.getJwtToken();
@@ -46,7 +40,7 @@ describe('LOGIN TESTS', () => {
         user_id_type: "uint32"
       }
     }
-    fetchMock.postOnce(host + '/login/service/', expectedResponse, { overwriteRoutes: false });
+    fetchMock.postOnce(opts.host + '/v1/login/service/', expectedResponse, { overwriteRoutes: false });
     const current = await api.loginService('serviceAccountNode', 'MyP@ssw0rd', 'wSSZQbPxKvBrk_n2B_m6ZA', 'test');
     expect(current).toEqual(expectedResponse);
     let jwtToken = api.getJwtToken();
@@ -58,7 +52,7 @@ describe('LOGIN TESTS', () => {
     const expectedResponse = {
       token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbmNyeXB..."
     }
-    fetchMock.postOnce(host + '/login/root/', expectedResponse, { overwriteRoutes: false });
+    fetchMock.postOnce(opts.host + '/v1/login/root/', expectedResponse, { overwriteRoutes: false });
     const current = await api.loginRoot("john@example.com", "MyP@ssw0rd");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -76,7 +70,7 @@ describe('LOGIN TESTS', () => {
         user_id_type: "uint32"
       }
     }
-    fetchMock.postOnce(host + '/login/refresh-token/', expectedResponse, { overwriteRoutes: false });
+    fetchMock.postOnce(opts.host + '/v1/login/refresh-token/', expectedResponse, { overwriteRoutes: false });
     const current = await api.loginRefreshToken();
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();

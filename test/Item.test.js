@@ -1,23 +1,29 @@
-require('jest-fetch-mock');
-const fetchMock = require('fetch-mock');
-jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
+const fetchMock = require('fetch-mock-jest');
 
 // ITEM-DATA-PROPERTIES ENDPOINTS
 describe('ITEM-DATA-PROPERTIES TESTS', () => {
-    const host = "http://localhost";
-    const api = new ApiClient(host);
-    const headers = {
-        'User-Agent': 'CrossingMinds/v1',
-        'Content-type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Bearer '
+    const opts = {
+        host: "http://localhost"
     }
+    const api = new ApiClient(opts);
+    const loginRefreshTokenResponse = {
+        "token": "eyJ0eX...",
+        "refresh_token": "mW+k/K...",
+        "database": {
+            "id": "wSSZQbPxKvBrk_n2B_m6ZA",
+            "name": "Example DB name",
+            "description": "Example DB longer description",
+            "item_id_type": "uuid",
+            "user_id_type": "uint32"
+        }
+    }
+    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('getItemProperty', async () => {
         const expectedResponse = { property_name: 'price', value_type: 'int8', repeated: false }
-        fetchMock.getOnce(host + '/items-properties/price/', expectedResponse, { headers: headers });
+        fetchMock.getOnce(opts.host + '/v1/items-properties/price/', expectedResponse);
         const current = await api.getItemProperty("price");
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -43,7 +49,7 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
                 }
             ]
         }
-        fetchMock.getOnce(host + '/items-properties/', expectedResponse, { headers: headers });
+        fetchMock.getOnce(opts.host + '/v1/items-properties/', expectedResponse);
         const current = await api.listAllItemProperties();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -51,7 +57,7 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
 
     test('createItemProperty', async () => {
         const expectedResponse = {}
-        fetchMock.postOnce(host + '/items-properties/', expectedResponse, { headers: headers });
+        fetchMock.postOnce(opts.host + '/v1/items-properties/', expectedResponse);
         const current = await api.createItemProperty('price', 'float32', false);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -59,7 +65,7 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
 
     test('deleteItemProperty', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(host + '/items-properties/price/', expectedResponse, { headers: headers });
+        fetchMock.deleteOnce(opts.host + '/v1/items-properties/price/', expectedResponse);
         const current = await api.deleteItemProperty('price');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -71,7 +77,7 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
             value_type: "float32",
             repeated: false
         }
-        fetchMock.getOnce(host + '/items/123e4567-e89b-12d3-a456-426614174000/', expectedResponse, { headers: headers });
+        fetchMock.getOnce(opts.host + '/v1/items/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
         const current = await api.getItem('123e4567-e89b-12d3-a456-426614174000');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -86,7 +92,7 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
                 price: 9.99
             }
         }
-        fetchMock.putOnce(host + '/items/123e4567-e89b-12d3-a456-426614174000/', expectedResponse, { headers: headers });
+        fetchMock.putOnce(opts.host + '/v1/items/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
         const current = await api.createOrUpdateItem('123e4567-e89b-12d3-a456-426614174000', item);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -108,7 +114,7 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
                 genres: ["thriller"]
             }
         ]
-        fetchMock.putOnce(host + '/items-bulk/', expectedResponse, { headers: headers });
+        fetchMock.putOnce(opts.host + '/v1/items-bulk/', expectedResponse);
         const current = await api.createOrUpdateItemsBulk(items);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -136,8 +142,8 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
         let queryParams = {}
         queryParams['amt'] = 100;
         queryParams['cursor'] = 'Q21vU1pHb1FjSEp...';
-        let path = '/items-bulk/?' + utils.convertToQueryString(queryParams);
-        fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
+        let path = '/v1/items-bulk/' + utils.convertToQueryString(queryParams);
+        fetchMock.getOnce(opts.host + path, expectedResponse);
         const current = await api.listItemsPaginated(100, 'Q21vU1pHb1FjSEp...');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -164,8 +170,28 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
             "123e4567-e89b-12d3-a456-426614174000",
             "c3391d83-553b-40e7-818e-fcf658ec397d"
         ]
-        fetchMock.postOnce(host + '/items-bulk/list/', expectedResponse, { headers: headers });
+        fetchMock.postOnce(opts.host + '/v1/items-bulk/list/', expectedResponse);
         const current = await api.listItems(itemsId);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('deleteItem', async () => {
+        const expectedResponse = {}
+        fetchMock.deleteOnce(opts.host + '/v1/items/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        const current = await api.deleteItem('123e4567-e89b-12d3-a456-426614174000');
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('deleteItemsBulk', async () => {
+        const expectedResponse = {}
+        const itemsId = [
+            "123e4567-e89b-12d3-a456-426614174000",
+            "c3391d83-553b-40e7-818e-fcf658ec397d"
+        ]
+        fetchMock.deleteOnce(opts.host + '/v1/items-bulk/', expectedResponse);
+        const current = await api.deleteItemsBulk(itemsId);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });

@@ -1,6 +1,6 @@
 {
   "name": "xminds-sdk-nodejs",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Node JS client for Crossing Minds B2B API",
   "main": "lib/ApiClient.js",
   "scripts": {
@@ -26,9 +26,8 @@
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/node": "^7.12.6",
-    "fetch-mock": "^9.11.0",
+    "fetch-mock-jest": "^1.5.1",
     "jest": "^27.3.0",
-    "jest-fetch-mock": "^3.0.3",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.1"
   }

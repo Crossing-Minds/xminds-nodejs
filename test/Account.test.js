@@ -1,23 +1,29 @@
-require('jest-fetch-mock');
-const fetchMock = require('fetch-mock');
-jest.setMock('isomorphic-fetch', fetchMock);
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
+const fetchMock = require('fetch-mock-jest');
 
 // ACCOUNT ENDPOINTS
 describe('ACCOUNT TESTS', () => {
-  const host = "http://localhost";
-  const api = new ApiClient(host);
-  const headers = {
-    'User-Agent': 'CrossingMinds/v1',
-    'Content-type': 'application/json',
-    Accept: 'application/json',
-    Authorization: 'Bearer '
+  const opts = {
+    host: "http://localhost"
   }
+  const api = new ApiClient(opts);
+  const loginRefreshTokenResponse = {
+    "token": "eyJ0eX...",
+    "refresh_token": "mW+k/K...",
+    "database": {
+      "id": "wSSZQbPxKvBrk_n2B_m6ZA",
+      "name": "Example DB name",
+      "description": "Example DB longer description",
+      "item_id_type": "uuid",
+      "user_id_type": "uint32"
+    }
+  }
+  fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
   test('createIndividualAccount', async () => {
     const expectedResponse = { "id": "z3hn6UoSYWtK4KUA" }
-    fetchMock.postOnce(host + '/accounts/individual/', expectedResponse, { headers: headers });
+    fetchMock.postOnce(opts.host + '/v1/accounts/individual/', expectedResponse);
     const current = await api.createIndividualAccount("John", "Doe", "john@example.com", "MyP@ssw0rd", "manager");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -25,7 +31,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('createServiceAccount', async () => {
     const expectedResponse = { "id": "z3hn6UoSYWtK4LFD" }
-    fetchMock.postOnce(host + '/accounts/service/', expectedResponse, { headers: headers });
+    fetchMock.postOnce(opts.host + '/v1/accounts/service/', expectedResponse);
     const current = await api.createServiceAccount("serviceAccountNode", "MyP@ssw0rd");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -33,7 +39,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('resendVerificationCode', async () => {
     const expectedResponse = {}
-    fetchMock.putOnce(host + '/accounts/resend-verification-code/', expectedResponse, { headers: headers });
+    fetchMock.putOnce(opts.host + '/v1/accounts/resend-verification-code/', expectedResponse);
     const current = await api.resendVerificationCode("john@example.com");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -42,8 +48,8 @@ describe('ACCOUNT TESTS', () => {
   test('verifyAccount', async () => {
     const expectedResponse = {}
     let queryParams = { 'code': 'abcd1234', 'email': 'john@example.com' }
-    let path = '/accounts/verify/?' + utils.convertToQueryString(queryParams);
-    fetchMock.getOnce(host + path, expectedResponse, { headers: headers });
+    let path = '/v1/accounts/verify/' + utils.convertToQueryString(queryParams);
+    fetchMock.getOnce(opts.host + path, expectedResponse);
     const current = await api.verifyAccount("abcd1234", "john@example.com");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -67,7 +73,7 @@ describe('ACCOUNT TESTS', () => {
         }
       ]
     }
-    fetchMock.getOnce(host + '/organizations/current/accounts/', expectedResponse, { headers: headers });
+    fetchMock.getOnce(opts.host + '/v1/organizations/current/accounts/', expectedResponse);
     const current = await api.listAllAccounts();
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -75,7 +81,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('deleteIndividualAccount', async () => {
     const expectedResponse = {}
-    fetchMock.deleteOnce(host + '/accounts/individual/', expectedResponse, { headers: headers });
+    fetchMock.deleteOnce(opts.host + '/v1/accounts/individual/', expectedResponse);
     const current = await api.deleteIndividualAccount("john@example.com");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -83,7 +89,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('deleteServiceAccount', async () => {
     const expectedResponse = {}
-    fetchMock.deleteOnce(host + '/accounts/service/', expectedResponse, { headers: headers });
+    fetchMock.deleteOnce(opts.host + '/v1/accounts/service/', expectedResponse);
     const current = await api.deleteServiceAccount("serviceAccountNode");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -91,7 +97,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('deleteCurrentAccount', async () => {
     const expectedResponse = {}
-    fetchMock.deleteOnce(host + '/accounts/', expectedResponse, { headers: headers });
+    fetchMock.deleteOnce(opts.host + '/v1/accounts/', expectedResponse);
     const current = await api.deleteCurrentAccount();
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
