@@ -166,4 +166,24 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
         expect(current).toMatchSnapshot();
     });
 
+    test('deleteUser', async () => {
+        const expectedResponse = {}
+        fetchMock.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        const current = await api.deleteUser('123e4567-e89b-12d3-a456-426614174000');
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('deleteUsersBulk', async () => {
+        const expectedResponse = {}
+        const usersId = [
+            "123e4567-e89b-12d3-a456-426614174000",
+            "c3391d83-553b-40e7-818e-fcf658ec397d"
+        ]
+        fetchMock.deleteOnce(opts.host + '/v1/users-bulk/', expectedResponse);
+        const current = await api.deleteUsersBulk(usersId);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
 });
