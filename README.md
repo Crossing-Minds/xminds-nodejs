@@ -286,22 +286,24 @@ client
 
 A retry policy is provided for use in some SDK methods, it is implemented with the exponential backoff strategy.
 
-The exponential attempt increment is calculated with _Math.pow(multiplier, attempt + 1) * base_
+The exponential attempt increment is calculated with _Math.pow(multiplier, attempt) * base_
 
-Optional parameters can be send to replace the default retry policy values.
+Optional parameters can be send to replace the default values.
+
+**Note:** Only error 429 is retried.
 
 ```js
-// Example of using retry with custom values:
-
-opts = { 
+// Example of using retry with custom values
+opts = {
   retry: { // Optional. If not present, the default values are used
     maxRetries: 2, // Optional. Default value: 3
     base: 200, // Optional. Default value: 100
     multiplier: 2 // Optional. Default value: 5
-  } 
+  }
 }
 
-api.createOrUpdateItem(itemId, item, opts)
+// opts parameter is Optional if not present, default values are used to retry
+client.createOrUpdateItem(itemId, item, opts)
 .then((data) => {
   console.log(data);
 })
@@ -309,7 +311,24 @@ api.createOrUpdateItem(itemId, item, opts)
   console.log(err);
 });
 ```
-**Note:** Only error 429 can be retried.
+
+Automatic retry can be skipped by providing the parameter as **`opts.retry.maxRetries = 0`**
+```js
+// Example of skipping retry
+opts = { 
+  retry: {
+    maxRetries: 0 // Will skip the retry policy
+  } 
+}
+
+client.createOrUpdateItem(itemId, item, opts)
+.then((data) => {
+  console.log(data);
+})
+.catch((err) => {
+  console.log(err);
+});
+```
 
 ## Documentation
 

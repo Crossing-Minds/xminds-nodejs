@@ -1,6 +1,6 @@
 {
   "name": "xminds-sdk-nodejs",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Node JS client for Crossing Minds B2B API",
   "main": "lib/ApiClient.js",
   "scripts": {
