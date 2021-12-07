@@ -1,5 +1,6 @@
 const { ApiClient } = require("../lib/ApiClient");
-const fetchMock = require('fetch-mock-jest');
+jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
+const fetchMock = require('isomorphic-fetch');
 
 // LOGIN REFRESH TOKEN 
 describe('LOGIN REFRESH TOKEN TEST', () => {
@@ -20,7 +21,13 @@ describe('LOGIN REFRESH TOKEN TEST', () => {
   }
 
   // Error response for first call of listAllDatabases service
-  const responseErr = new Response('{"error_code": "22", "error_name": "JwtTokenExpired", "message": "The JWT token has expired", "error_data": { "name": "JWT_TOKEN_EXPIRED" }}', { status: 401 });
+  const responseErr = {
+    json: function(){
+      return {"error_code": "22", "error_name": "JwtTokenExpired", "message": "The JWT token has expired", 
+              "error_data": { "name": "JWT_TOKEN_EXPIRED"}}
+    },
+    status: 401
+  };
   // Correct response for second call of listAllDatabases service
   const expectedResponseOK = {
     "has_next": false,

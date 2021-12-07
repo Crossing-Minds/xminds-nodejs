@@ -1,6 +1,7 @@
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
-const fetchMock = require('fetch-mock-jest');
+jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
+const fetchMock = require('isomorphic-fetch');
 
 // ACCOUNT ENDPOINTS
 describe('ACCOUNT TESTS', () => {

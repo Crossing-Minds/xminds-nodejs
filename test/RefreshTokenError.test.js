@@ -1,5 +1,7 @@
 const { ApiClient } = require("../lib/ApiClient");
-const fetchMock = require('fetch-mock-jest');
+jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
+const fetchMock = require('isomorphic-fetch');
+
 
 // LOGIN REFRESH TOKEN 
 describe('LOGIN REFRESH TOKEN ERROR TEST', () => {
@@ -9,15 +11,15 @@ describe('LOGIN REFRESH TOKEN ERROR TEST', () => {
   const api = new ApiClient(opts);
 
   // Error response for first call of listAllDatabases service
-  const responseErr = new Response('{"error_code": "22", "error_name": "JwtTokenExpired", "message": "The JWT token has expired", "error_data": { "name": "JWT_TOKEN_EXPIRED" }}', { status: 401 });
+  const responseErr = {"error_code": "22", "error_name": "JwtTokenExpired", "message": "The JWT token has expired", "error_data": { "name": "JWT_TOKEN_EXPIRED" }};
   // Error response for the Login Refresh Token 
-  const refreshTokenExpiredError = new Response('{"error_code": "28", "error_name": "RefreshTokenExpired", "message": "The refresh token has expired", "error_data": { "name": "REFRESH_TOKEN_EXPIRED" }}', { status: 401 });
+  const refreshTokenExpiredError = {"error_code": "28", "error_name": "RefreshTokenExpired", "message": "The refresh token has expired", "error_data": { "name": "REFRESH_TOKEN_EXPIRED" }};
 
   test('Should fail because Refresh Token has expired', async () => {
     // Mock the fetch() get method for first call with an error response when called
-    fetchMock.get(opts.host + '/v1/databases/?amt=64&page=1', responseErr);
+    fetchMock.get(opts.host + '/v1/databases/?amt=64&page=1', { body: responseErr, status: 401});
     // Mock the fetch() post method to return a correct response when called
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', refreshTokenExpiredError);
+    fetchMock.post(opts.host + '/v1/login/refresh-token/', { body: refreshTokenExpiredError, status: 401});
 
     const current = await api.listAllDatabases(64, 1)
       .catch(err => {
