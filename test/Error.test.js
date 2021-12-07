@@ -3,7 +3,8 @@ const { parseError, AuthError, JwtTokenExpiredError,
   DuplicatedError, TooManyRequestsError, RefreshTokenExpiredError,
   WrongDataError, ForbiddenError, NotFoundError, MethodNotAllowedError,
   ServerUnavailableError, ServerError } = require('../lib/XMindsError');
-const fetchMock = require('fetch-mock-jest');
+  jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
+  const fetchMock = require('isomorphic-fetch');
 
 // ERROR TESTS
 describe('ERRORS TESTS', () => {
@@ -152,8 +153,8 @@ describe('ERRORS TESTS', () => {
   });
 
   test('listAllDatabases should throw a ServerError', async () => {
-    const serverErrorResponse = new Response('{"error_code": "0", "message": "Internal Server Error"}', { status: 500 });
-    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', serverErrorResponse);
+    const serverErrorResponse = {"error_code": "0", "message": "Internal Server Error"}
+    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', { body: serverErrorResponse, status: 500 });
     api.listAllDatabases(64, 1).catch(err => {
       expect(err.message).toEqual('Internal Server Error');
     });
