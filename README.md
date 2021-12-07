@@ -281,6 +281,36 @@ client
   });
 ```
 
+
+**Retrying requests on failure**
+
+A retry policy is provided for use in some SDK methods, it is implemented with the exponential backoff strategy.
+
+The exponential attempt increment is calculated with _Math.pow(multiplier, attempt + 1) * base_
+
+Optional parameters can be send to replace the default retry policy values.
+
+```js
+// Example of using retry with custom values:
+
+opts = { 
+  retry: { // Optional. If not present, the default values are used
+    maxRetries: 2, // Optional. Default value: 3
+    base: 200, // Optional. Default value: 100
+    multiplier: 2 // Optional. Default value: 5
+  } 
+}
+
+api.createOrUpdateItem(itemId, item, opts)
+.then((data) => {
+  console.log(data);
+})
+.catch((err) => {
+  console.log(err);
+});
+```
+**Note:** Only error 429 can be retried.
+
 ## Documentation
 
 [API documentation](https://docs.api.crossingminds.com/index.html)
