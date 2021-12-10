@@ -154,7 +154,7 @@ describe('ERRORS TESTS', () => {
 
   test('listAllDatabases should throw a ServerError', async () => {
     const serverErrorResponse = {"error_code": "0", "message": "Internal Server Error"}
-    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', { body: serverErrorResponse, status: 500 });
+    fetchMock.get(opts.host + '/v1/databases/?amt=64&page=1', { body: serverErrorResponse, status: 500 });
     api.listAllDatabases(64, 1).catch(err => {
       expect(err.message).toEqual('Internal Server Error');
     });

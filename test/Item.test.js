@@ -197,4 +197,41 @@ describe('ITEM-DATA-PROPERTIES TESTS', () => {
         expect(current).toMatchSnapshot();
     });
 
+    test('partialUpdateItem', async () => {
+        const expectedResponse = {}
+        const item = {
+            item: {
+                tags: ["family", "sci-fi"],
+                genres: ["drama", "comedy"],
+                price: 9.99
+            }
+        }
+        fetchMock.patchOnce(opts.host + '/v1/items/123e4567-e89b-12d3-a456-426614174000/', expectedResponse, { overwriteRoutes: false });
+        const current = await api.partialUpdateItem('123e4567-e89b-12d3-a456-426614174000', item);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('partialUpdateItemsBulk', async () => {
+        const expectedResponse = {}
+        const items = [
+            {
+                item_id: "123e4567-e89b-12d3-a456-426614174000",
+                price: 9.99,
+                tags: ["family", "sci-fi"],
+                genres: ["drama", "comedy"]
+            },
+            {
+                item_id: "c3391d83-553b-40e7-818e-fcf658ec397d",
+                price: 4.49,
+                tags: ["family"],
+                genres: ["thriller"]
+            }
+        ]
+        fetchMock.patchOnce(opts.host + '/v1/items-bulk/', expectedResponse, { overwriteRoutes: false });
+        const current = await api.partialUpdateItemsBulk(items);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
 });

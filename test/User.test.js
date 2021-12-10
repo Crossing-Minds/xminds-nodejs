@@ -187,4 +187,38 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
         expect(current).toMatchSnapshot();
     });
 
+    test('partialUpdateUser', async () => {
+        const expectedResponse = {}
+        const user = {
+            user: {
+                subscriptions: ["channel1", "channel2"],
+                age: 25
+            }
+        }
+        fetchMock.patchOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        const current = await api.partialUpdateUser('123e4567-e89b-12d3-a456-426614174000', user);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('partialUpdateUsersBulk', async () => {
+        const expectedResponse = {}
+        const users = [
+            {
+                user_id: "123e4567-e89b-12d3-a456-426614174000",
+                age: 25,
+                subscriptions: ["channel1", "channel2"]
+            },
+            {
+                user_id: "c3391d83-553b-40e7-818e-fcf658ec397d",
+                age: 32,
+                subscriptions: ["channel1"]
+            }
+        ]
+        fetchMock.patchOnce(opts.host + '/v1/users-bulk/', expectedResponse);
+        const current = await api.partialUpdateUsersBulk(users);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
 });
