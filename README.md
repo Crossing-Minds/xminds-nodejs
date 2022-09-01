@@ -335,3 +335,4 @@ client.createOrUpdateItem(itemId, item, opts)
 [API documentation](https://docs.api.crossingminds.com/index.html)
 
 Release version: 1.0.0
+
