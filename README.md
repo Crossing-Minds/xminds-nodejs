@@ -206,7 +206,7 @@ client
     console.log(err);
   });
 
-// Create or update large bulks of interactions for a user and many items
+// Create large bulks of interactions for a user and many items
 const userId = "192251";
 const interactions = [
   {
@@ -226,7 +226,7 @@ const interactions = [
   },
 ];
 client
-  .createOrUpdateUserInteractionsBulk(userId, interactions)
+  .createUserInteractionsBulk(userId, interactions)
   .then((data) => {
     console.log(data);
   })
@@ -281,12 +281,11 @@ client
   });
 ```
 
-
 **Retrying requests on failure**
 
 A retry policy is provided for use in some SDK methods, it is implemented with the exponential backoff strategy.
 
-The exponential attempt increment is calculated with _Math.pow(multiplier, attempt) * base_
+The exponential attempt increment is calculated with _Math.pow(multiplier, attempt) \* base_
 
 Optional parameters can be send to replace the default values.
 
@@ -295,39 +294,43 @@ Optional parameters can be send to replace the default values.
 ```js
 // Example of using retry with custom values
 opts = {
-  retry: { // Optional. If not present, the default values are used
+  retry: {
+    // Optional. If not present, the default values are used
     maxRetries: 2, // Optional. Default value: 3
     base: 200, // Optional. Default value: 100
-    multiplier: 2 // Optional. Default value: 5
-  }
-}
+    multiplier: 2, // Optional. Default value: 5
+  },
+};
 
 // opts parameter is Optional if not present, default values are used to retry
-client.createOrUpdateItem(itemId, item, opts)
-.then((data) => {
-  console.log(data);
-})
-.catch((err) => {
-  console.log(err);
-});
+client
+  .createOrUpdateItem(itemId, item, opts)
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 ```
 
 Automatic retry can be skipped by providing the parameter as **`opts.retry.maxRetries = 0`**
+
 ```js
 // Example of skipping retry
-opts = { 
+opts = {
   retry: {
-    maxRetries: 0 // Will skip the retry policy
-  } 
-}
+    maxRetries: 0, // Will skip the retry policy
+  },
+};
 
-client.createOrUpdateItem(itemId, item, opts)
-.then((data) => {
-  console.log(data);
-})
-.catch((err) => {
-  console.log(err);
-});
+client
+  .createOrUpdateItem(itemId, item, opts)
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 ```
 
 ## Documentation
