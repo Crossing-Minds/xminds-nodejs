@@ -30,7 +30,7 @@ describe('USER-INTERACTION TESTS', () => {
         expect(current).toMatchSnapshot();
     });
 
-    test('createOrUpdateUserInteractionsBulk', async () => {
+    test('createUserInteractionsBulk', async () => {
         const interactions = [
             { "item_id": "123e4567-e89b-12d3-a456-426614174000", "interaction_type": "productView", "timestamp": 1588812345 },
             { "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "productView", "timestamp": 1588854321 },
@@ -38,12 +38,12 @@ describe('USER-INTERACTION TESTS', () => {
         ]
         const expectedResponse = {}
         fetchMock.postOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/interactions-bulk/', expectedResponse);
-        const current = await api.createOrUpdateUserInteractionsBulk('123e4567-e89b-12d3-a456-426614174000', interactions);
+        const current = await api.createUserInteractionsBulk('123e4567-e89b-12d3-a456-426614174000', interactions);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });
 
-    test('createOrUpdateUsersInteractionsBulk', async () => {
+    test('createUsersInteractionsBulk', async () => {
         const interactions = [
             { "user_id": 1234, "item_id": "123e4567-e89b-12d3-a456-426614174000", "interaction_type": "productView", "timestamp": 1588812345 },
             { "user_id": 1234, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "productView", "timestamp": 1588854321 },
@@ -51,7 +51,7 @@ describe('USER-INTERACTION TESTS', () => {
         ]
         const expectedResponse = {}
         fetchMock.postOnce(opts.host + '/v1/interactions-bulk/', expectedResponse);
-        const current = await api.createOrUpdateUsersInteractionsBulk(interactions);
+        const current = await api.createUsersInteractionsBulk(interactions);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });
