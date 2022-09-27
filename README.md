@@ -140,6 +140,33 @@ client.getRecommendationsSessionToItems(opts)
     .catch(err => {
         console.log(err);
     });
+
+
+// c) Example with session Id
+
+// Optional parameters
+const opts = {
+    amt: 10,
+    filters: [
+        {"property_name": "tags", "op": "in", "value": ["family", "fiction"]},
+        {"property_name": "poster", "op": "notempty"},
+    ],
+    user_properties: { "age": 25 },
+    ratings: [
+        {"item_id": "123e4567-e89b-12d3-a456-426614174000", "rating": 8.5},
+        {"item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "rating": 2.0}
+    ],
+    session_id: "c2a73584-bbd0-4f04-b497-26bf70152932"
+}
+
+// Get items recommendations given the ratings for a specific session.
+client.getRecommendationsSessionToItems(opts)
+    .then(data => {
+        console.log(data);
+    })
+    .catch(err => {
+        console.log(err);
+    });
 ```
 
 **Fetching users**
@@ -193,6 +220,8 @@ client
 **Creating interactions**
 
 ```js
+// Examples for User Interactions
+
 // Create a new interaction for a user and an item
 const userId = "192251";
 const itemId = "031242227X";
@@ -227,6 +256,85 @@ const interactions = [
 ];
 client
   .createUserInteractionsBulk(userId, interactions)
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+// Examples for Anonymous Session Interactions
+
+// Create a new interaction for an anonymous session and an item
+const sessionId = "1234";
+const itemId = "c3391d83-553b-40e7-818e-fcf658ec397d";
+const interactionType = "productView";
+const timestamp = 1588812345;
+client
+  .createAnonymousSessionInteraction(
+    sessionId,
+    itemId,
+    interactionType,
+    timestamp
+  )
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+// Create large bulks of interactions for an anonymous session and many items
+const sessionId = "1234";
+const interactions = [
+  {
+    item_id: "123e4567-e89b-12d3-a456-426614174000",
+    interaction_type: "productView",
+    timestamp: 1588812345,
+  },
+  {
+    item_id: "c3391d83-553b-40e7-818e-fcf658ec397d",
+    interaction_type: "productView",
+    timestamp: 1588854321,
+  },
+  {
+    item_id: "c3391d83-553b-40e7-818e-fcf658ec397d",
+    interaction_type: "addToCart",
+    timestamp: 1588866349,
+  },
+];
+client
+  .createAnonymousSessionInteractionsBulk(sessionId, interactions)
+  .then((data) => {
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+// Create large bulks of interactions for many anonymous sessions and many items.
+const interactions = [
+  {
+    session_id: 1234,
+    item_id: "123e4567-e89b-12d3-a456-426614174000",
+    interaction_type: "productView",
+    timestamp: 1588812345,
+  },
+  {
+    session_id: 1234,
+    item_id: "c3391d83-553b-40e7-818e-fcf658ec397d",
+    interaction_type: "productView",
+    timestamp: 1588854321,
+  },
+  {
+    session_id: 333,
+    item_id: "c3391d83-553b-40e7-818e-fcf658ec397d",
+    interaction_type: "addToCart",
+    timestamp: 1588811111,
+  },
+];
+client
+  .createAnonymousSessionsInteractionsBulk(interactions)
   .then((data) => {
     console.log(data);
   })
