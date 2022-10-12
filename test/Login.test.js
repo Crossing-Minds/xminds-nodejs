@@ -53,7 +53,7 @@ describe('LOGIN TESTS', () => {
     const expectedResponse = {
       token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbmNyeXB..."
     }
-    fetchMock.postOnce(opts.host + '/v1/login/root/', expectedResponse, { overwriteRoutes: false });
+    fetchMock.postOnce(opts.host + '/v1/login/individual/', expectedResponse, { overwriteRoutes: false });
     const current = await api.loginRoot("john@example.com", "MyP@ssw0rd");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
