@@ -3,7 +3,7 @@ const utils = require('../lib/Utils');
 jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
 const fetchMock = require('isomorphic-fetch');
 
-// USER-INTERACTIONS ENDPOINTS
+// USER AND SESSION INTERACTIONS ENDPOINTS
 describe('USER-INTERACTION TESTS', () => {
     const opts = {
         host: "http://localhost"
@@ -22,6 +22,7 @@ describe('USER-INTERACTION TESTS', () => {
     }
     fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
+    // User Interactions
     test('createInteraction', async () => {
         const expectedResponse = {}
         fetchMock.postOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/interactions/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
@@ -85,8 +86,49 @@ describe('USER-INTERACTION TESTS', () => {
             { "session_id": 333, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "addToCart", "timestamp": 1588811111 },
         ]
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/sessions/interactions-bulk/', expectedResponse);
+        fetchMock.postOnce(opts.host + '/v1/sessions-interactions-bulk/', expectedResponse);
         const current = await api.createAnonymousSessionsInteractionsBulk(interactions);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('listAnonymousSessionsInteractions', async () => {
+        const expectedResponse = {
+            "has_next": true,
+            "next_cursor": "Q21vU1pHb1FjSEp...",
+            "interactions": [
+                { "session_id": 1234, "item_id": "123e4567-e89b-12d3-a456-426614174000", "interaction_type": "productView", "timestamp": 1588812345 },
+                { "session_id": 1234, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "addToCart", "timestamp": 1588854321 },
+                { "session_id": 333, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "productView", "timestamp": 1588811111 },
+            ]
+        }
+        fetchMock.getOnce(opts.host + '/v1/sessions-interactions-bulk/', expectedResponse);
+        const current = await api.listAnonymousSessionsInteractions();
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('resolveAnonymousSession', async () => {
+        const userId = "123e4567-e89b-12d3-a456-426614174000";
+        const sessionId = "c3391d83-553b-40e7-818e-fcf658ec397d";
+        const timestamp = 1588812345;
+        const expectedResponse = {}
+        fetchMock.postOnce(opts.host + `/v1/sessions/${sessionId}/resolve/`, expectedResponse);
+        const current = await api.resolveAnonymousSession(userId, sessionId, timestamp);
+        expect(current).toEqual(expectedResponse);
+        expect(current).toMatchSnapshot();
+    });
+
+    test('listResolvedAnonymousSessionsByUsers', async () => {
+        const usersId = [
+            "123e4567-e89b-12d3-a456-426614174000",
+            "c3391d83-553b-40e7-818e-fcf658ec397d"
+        ];
+        const amt = 10;
+        const cursor = "F25pU1vHb1LjSEp...";
+        const expectedResponse = {}
+        fetchMock.postOnce(opts.host + '/v1/resolved-sessions/', expectedResponse);
+        const current = await api.listResolvedAnonymousSessionsByUsers(usersId, amt, cursor);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
     });
