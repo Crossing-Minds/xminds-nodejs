@@ -444,3 +444,4 @@ client
 ## Documentation
 
 [API documentation](https://docs.api.crossingminds.com/index.html)
+Release 2.8.0
