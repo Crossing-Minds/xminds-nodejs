@@ -1,7 +1,6 @@
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // USER-RATINGS ENDPOINTS
 describe('USER-RATINGS TESTS', () => {
@@ -20,11 +19,11 @@ describe('USER-RATINGS TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('createOrUpdateRating', async () => {
         const expectedResponse = {}
-        fetchMock.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
+        globalThis.fetch.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
         const current = await api.createOrUpdateRating('123e4567-e89b-12d3-a456-426614174000', 'c3391d83-553b-40e7-818e-fcf658ec397d', 8.5, 1588812345);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -32,7 +31,7 @@ describe('USER-RATINGS TESTS', () => {
 
     test('deleteRating', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
         const current = await api.deleteRating('123e4567-e89b-12d3-a456-426614174000', 'c3391d83-553b-40e7-818e-fcf658ec397d');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -49,7 +48,7 @@ describe('USER-RATINGS TESTS', () => {
         }
         let queryParams = { "page": 1, "amt": 10 };
         let path = '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/' + utils.convertToQueryString(queryParams);
-        fetchMock.getOnce(opts.host + path, expectedResponse);
+        globalThis.fetch.getOnce(opts.host + path, expectedResponse);
         const current = await api.listUserRatings('123e4567-e89b-12d3-a456-426614174000', 1, 10);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -61,7 +60,7 @@ describe('USER-RATINGS TESTS', () => {
             { item_id: "c3391d83-553b-40e7-818e-fcf658ec397d", rating: 2.0, timestamp: 1588854321 }
         ]
         const expectedResponse = {}
-        fetchMock.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/', expectedResponse);
+        globalThis.fetch.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/', expectedResponse);
         const current = await api.createOrUpdateUserRatingsBulk('123e4567-e89b-12d3-a456-426614174000', ratings);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -69,7 +68,7 @@ describe('USER-RATINGS TESTS', () => {
 
     test('deleteUserRatings', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/', expectedResponse);
         const current = await api.deleteUserRatings('123e4567-e89b-12d3-a456-426614174000');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -82,7 +81,7 @@ describe('USER-RATINGS TESTS', () => {
             { user_id: 333, item_id: "c3391d83-553b-40e7-818e-fcf658ec397d", rating: 5.5, timestamp: 1588811111 },
         ]
         const expectedResponse = {}
-        fetchMock.putOnce(opts.host + '/v1/ratings-bulk/', expectedResponse);
+        globalThis.fetch.putOnce(opts.host + '/v1/ratings-bulk/', expectedResponse);
         const current = await api.createOrUpdateRatingsBulk(ratings);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -102,7 +101,7 @@ describe('USER-RATINGS TESTS', () => {
         queryParams['page'] = '1';
         queryParams['cursor'] = 'Q21vU1pHb1FjSEp...';
         let path = '/v1/ratings-bulk/' + utils.convertToQueryString(queryParams);
-        fetchMock.getOnce(opts.host + path, expectedResponse);
+        globalThis.fetch.getOnce(opts.host + path, expectedResponse);
         const current = await api.listRatings(1, "Q21vU1pHb1FjSEp...");
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();

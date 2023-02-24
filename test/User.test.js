@@ -1,7 +1,6 @@
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // USER-DATA-PROPERTIES ENDPOINTS
 describe('USER-DATA-PROPERTIES TESTS', () => {
@@ -20,11 +19,11 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('getUserProperty', async () => {
         const expectedResponse = { property_name: 'age', value_type: 'int8', repeated: false }
-        fetchMock.getOnce(opts.host + '/v1/users-properties/age/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/users-properties/age/', expectedResponse);
         const current = await api.getUserProperty("age");
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -45,7 +44,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
                 }
             ]
         }
-        fetchMock.getOnce(opts.host + '/v1/users-properties/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/users-properties/', expectedResponse);
         const current = await api.listAllUserProperties();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -53,7 +52,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
 
     test('createUserProperty', async () => {
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/users-properties/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/users-properties/', expectedResponse);
         const current = await api.createUserProperty('age', 'int8', false);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -61,7 +60,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
 
     test('deleteUserProperty', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/users-properties/age/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/users-properties/age/', expectedResponse);
         const current = await api.deleteUserProperty('age');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -75,7 +74,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
                 age: 25
             }
         }
-        fetchMock.getOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
         const current = await api.getUser('123e4567-e89b-12d3-a456-426614174000');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -89,7 +88,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
                 age: 25
             }
         }
-        fetchMock.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        globalThis.fetch.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
         const current = await api.createOrUpdateUser('123e4567-e89b-12d3-a456-426614174000', user);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -109,7 +108,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
                 subscriptions: ["channel1"]
             }
         ]
-        fetchMock.putOnce(opts.host + '/v1/users-bulk/', expectedResponse);
+        globalThis.fetch.putOnce(opts.host + '/v1/users-bulk/', expectedResponse);
         const current = await api.createOrUpdateUsersBulk(users);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -136,7 +135,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
         queryParams['amt'] = 100;
         queryParams['cursor'] = 'Q21vU1pHb1FjSEp...';
         let path = '/users-bulk/' + utils.convertToQueryString(queryParams);
-        fetchMock.get(opts.host + '/v1' + path, expectedResponse);
+        globalThis.fetch.get(opts.host + '/v1' + path, expectedResponse);
         const current = await api.listUsersPaginated(100, 'Q21vU1pHb1FjSEp...');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -161,7 +160,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
             "123e4567-e89b-12d3-a456-426614174000",
             "c3391d83-553b-40e7-818e-fcf658ec397d"
         ]
-        fetchMock.postOnce(opts.host + '/v1/users-bulk/list/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/users-bulk/list/', expectedResponse);
         const current = await api.listUsers(usersId);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -169,7 +168,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
 
     test('deleteUser', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
         const current = await api.deleteUser('123e4567-e89b-12d3-a456-426614174000');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -181,7 +180,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
             "123e4567-e89b-12d3-a456-426614174000",
             "c3391d83-553b-40e7-818e-fcf658ec397d"
         ]
-        fetchMock.deleteOnce(opts.host + '/v1/users-bulk/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/users-bulk/', expectedResponse);
         const current = await api.deleteUsersBulk(usersId);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -195,7 +194,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
                 age: 25
             }
         }
-        fetchMock.patchOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
+        globalThis.fetch.patchOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', expectedResponse);
         const current = await api.partialUpdateUser('123e4567-e89b-12d3-a456-426614174000', user);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -215,7 +214,7 @@ describe('USER-DATA-PROPERTIES TESTS', () => {
                 subscriptions: ["channel1"]
             }
         ]
-        fetchMock.patchOnce(opts.host + '/v1/users-bulk/', expectedResponse);
+        globalThis.fetch.patchOnce(opts.host + '/v1/users-bulk/', expectedResponse);
         const current = await api.partialUpdateUsersBulk(users);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
