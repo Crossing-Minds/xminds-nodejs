@@ -1,6 +1,5 @@
 const { ApiClient } = require("../lib/ApiClient");
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // DATABASE ENDPOINTS
 describe('DATABASE TESTS', () => {
@@ -19,11 +18,11 @@ describe('DATABASE TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('createDatabase', async () => {
         const expectedResponse = { id: "wSSZQbPxKvBrk_n2B_m6ZA" }
-        fetchMock.postOnce(opts.host + '/v1/databases/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/databases/', expectedResponse);
         const current = await api.createDatabase("Example DB name", "Example DB longer description", "uuid", "uint32");
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -43,7 +42,7 @@ describe('DATABASE TESTS', () => {
                 }
             ]
         }
-        fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/databases/?amt=64&page=1', expectedResponse);
         const current = await api.listAllDatabases(64, 1);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -62,7 +61,7 @@ describe('DATABASE TESTS', () => {
                 item: 81
             }
         }
-        fetchMock.getOnce(opts.host + '/v1/databases/current/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/databases/current/', expectedResponse);
         const current = await api.getCurrentDatabase();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -70,7 +69,7 @@ describe('DATABASE TESTS', () => {
 
     test('deleteCurrentDatabase', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/databases/current/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/databases/current/', expectedResponse);
         const current = await api.deleteCurrentDatabase();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -78,7 +77,7 @@ describe('DATABASE TESTS', () => {
 
     test('getCurrentDatabaseStatus', async () => {
         const expectedResponse = { status: "ready" }
-        fetchMock.getOnce(opts.host + '/v1/databases/current/status/', { body: expectedResponse });
+        globalThis.fetch.getOnce(opts.host + '/v1/databases/current/status/', { body: expectedResponse });
         const current = await api.getCurrentDatabaseStatus();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();

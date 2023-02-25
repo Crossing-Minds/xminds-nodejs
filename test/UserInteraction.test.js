@@ -1,7 +1,5 @@
 const { ApiClient } = require("../lib/ApiClient");
-const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // USER AND SESSION INTERACTIONS ENDPOINTS
 describe('USER-INTERACTION TESTS', () => {
@@ -20,12 +18,12 @@ describe('USER-INTERACTION TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     // User Interactions
     test('createInteraction', async () => {
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/interactions/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/interactions/c3391d83-553b-40e7-818e-fcf658ec397d/', expectedResponse);
         const current = await api.createInteraction('123e4567-e89b-12d3-a456-426614174000', 'c3391d83-553b-40e7-818e-fcf658ec397d', 'productView', 1588812345);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -38,7 +36,7 @@ describe('USER-INTERACTION TESTS', () => {
             { "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "addToCart", "timestamp": 1588811111 },
         ]
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/interactions-bulk/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/interactions-bulk/', expectedResponse);
         const current = await api.createUserInteractionsBulk('123e4567-e89b-12d3-a456-426614174000', interactions);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -51,7 +49,7 @@ describe('USER-INTERACTION TESTS', () => {
             { "user_id": 333, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "addToCart", "timestamp": 1588811111 },
         ]
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/interactions-bulk/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/interactions-bulk/', expectedResponse);
         const current = await api.createUsersInteractionsBulk(interactions);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -60,7 +58,7 @@ describe('USER-INTERACTION TESTS', () => {
     // Anonymous Session Interactions
     test('createAnonymousSessionInteraction', async () => {
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/sessions/123e4567-e89b-12d3-a456-426614174000/items/c3391d83-553b-40e7-818e-fcf658ec397d/interactions/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/sessions/123e4567-e89b-12d3-a456-426614174000/items/c3391d83-553b-40e7-818e-fcf658ec397d/interactions/', expectedResponse);
         const current = await api.createAnonymousSessionInteraction('123e4567-e89b-12d3-a456-426614174000', 'c3391d83-553b-40e7-818e-fcf658ec397d', 'productView', 1588812345);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -73,7 +71,7 @@ describe('USER-INTERACTION TESTS', () => {
             { "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "addToCart", "timestamp": 1588811111 },
         ]
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/sessions/123e4567-e89b-12d3-a456-426614174000/interactions-bulk/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/sessions/123e4567-e89b-12d3-a456-426614174000/interactions-bulk/', expectedResponse);
         const current = await api.createAnonymousSessionInteractionsBulk('123e4567-e89b-12d3-a456-426614174000', interactions);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -86,7 +84,7 @@ describe('USER-INTERACTION TESTS', () => {
             { "session_id": 333, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "addToCart", "timestamp": 1588811111 },
         ]
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/sessions-interactions-bulk/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/sessions-interactions-bulk/', expectedResponse);
         const current = await api.createAnonymousSessionsInteractionsBulk(interactions);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -102,7 +100,7 @@ describe('USER-INTERACTION TESTS', () => {
                 { "session_id": 333, "item_id": "c3391d83-553b-40e7-818e-fcf658ec397d", "interaction_type": "productView", "timestamp": 1588811111 },
             ]
         }
-        fetchMock.getOnce(opts.host + '/v1/sessions-interactions-bulk/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/sessions-interactions-bulk/', expectedResponse);
         const current = await api.listAnonymousSessionsInteractions();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -113,7 +111,7 @@ describe('USER-INTERACTION TESTS', () => {
         const sessionId = "c3391d83-553b-40e7-818e-fcf658ec397d";
         const timestamp = 1588812345;
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + `/v1/sessions/${sessionId}/resolve/`, expectedResponse);
+        globalThis.fetch.postOnce(opts.host + `/v1/sessions/${sessionId}/resolve/`, expectedResponse);
         const current = await api.resolveAnonymousSession(userId, sessionId, timestamp);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -127,7 +125,7 @@ describe('USER-INTERACTION TESTS', () => {
         const amt = 10;
         const cursor = "F25pU1vHb1LjSEp...";
         const expectedResponse = {}
-        fetchMock.postOnce(opts.host + '/v1/resolved-sessions/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/resolved-sessions/', expectedResponse);
         const current = await api.listResolvedAnonymousSessionsByUsers(usersId, amt, cursor);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();

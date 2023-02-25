@@ -1,7 +1,6 @@
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // ACCOUNT ENDPOINTS
 describe('ACCOUNT TESTS', () => {
@@ -20,11 +19,11 @@ describe('ACCOUNT TESTS', () => {
       "user_id_type": "uint32"
     }
   }
-  fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+  globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
   test('createIndividualAccount', async () => {
     const expectedResponse = { "id": "z3hn6UoSYWtK4KUA" }
-    fetchMock.postOnce(opts.host + '/v1/accounts/individual/', expectedResponse);
+    globalThis.fetch.postOnce(opts.host + '/v1/accounts/individual/', expectedResponse);
     const current = await api.createIndividualAccount("John", "Doe", "john@example.com", "MyP@ssw0rd", "manager");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -32,7 +31,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('createServiceAccount', async () => {
     const expectedResponse = { "id": "z3hn6UoSYWtK4LFD" }
-    fetchMock.postOnce(opts.host + '/v1/accounts/service/', expectedResponse);
+    globalThis.fetch.postOnce(opts.host + '/v1/accounts/service/', expectedResponse);
     const current = await api.createServiceAccount("serviceAccountNode", "MyP@ssw0rd");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -40,7 +39,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('resendVerificationCode', async () => {
     const expectedResponse = {}
-    fetchMock.putOnce(opts.host + '/v1/accounts/resend-verification-code/', expectedResponse);
+    globalThis.fetch.putOnce(opts.host + '/v1/accounts/resend-verification-code/', expectedResponse);
     const current = await api.resendVerificationCode("john@example.com");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -50,7 +49,7 @@ describe('ACCOUNT TESTS', () => {
     const expectedResponse = {}
     let queryParams = { 'code': 'abcd1234', 'email': 'john@example.com' }
     let path = '/v1/accounts/verify/' + utils.convertToQueryString(queryParams);
-    fetchMock.getOnce(opts.host + path, expectedResponse);
+    globalThis.fetch.getOnce(opts.host + path, expectedResponse);
     const current = await api.verifyAccount("abcd1234", "john@example.com");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -74,7 +73,7 @@ describe('ACCOUNT TESTS', () => {
         }
       ]
     }
-    fetchMock.getOnce(opts.host + '/v1/organizations/current/accounts/', expectedResponse);
+    globalThis.fetch.getOnce(opts.host + '/v1/organizations/current/accounts/', expectedResponse);
     const current = await api.listAllAccounts();
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -82,7 +81,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('deleteIndividualAccount', async () => {
     const expectedResponse = {}
-    fetchMock.deleteOnce(opts.host + '/v1/accounts/individual/', expectedResponse);
+    globalThis.fetch.deleteOnce(opts.host + '/v1/accounts/individual/', expectedResponse);
     const current = await api.deleteIndividualAccount("john@example.com");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -90,7 +89,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('deleteServiceAccount', async () => {
     const expectedResponse = {}
-    fetchMock.deleteOnce(opts.host + '/v1/accounts/service/', expectedResponse);
+    globalThis.fetch.deleteOnce(opts.host + '/v1/accounts/service/', expectedResponse);
     const current = await api.deleteServiceAccount("serviceAccountNode");
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();
@@ -98,7 +97,7 @@ describe('ACCOUNT TESTS', () => {
 
   test('deleteCurrentAccount', async () => {
     const expectedResponse = {}
-    fetchMock.deleteOnce(opts.host + '/v1/accounts/', expectedResponse);
+    globalThis.fetch.deleteOnce(opts.host + '/v1/accounts/', expectedResponse);
     const current = await api.deleteCurrentAccount();
     expect(current).toEqual(expectedResponse);
     expect(current).toMatchSnapshot();

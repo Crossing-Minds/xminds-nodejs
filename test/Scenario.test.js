@@ -1,7 +1,5 @@
 const { ApiClient } = require("../lib/ApiClient");
-const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // SCENARIOS ENDPOINTS
 describe('SCENARIOS TESTS', () => {
@@ -20,7 +18,7 @@ describe('SCENARIOS TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('getScenario', async () => {
         const expectedResponse = {
@@ -40,7 +38,7 @@ describe('SCENARIOS TESTS', () => {
                 }
             }
         }
-        fetchMock.getOnce(opts.host + '/v1/scenarios/item-to-item/my-case-scenario/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/scenarios/item-to-item/my-case-scenario/', expectedResponse);
         const current = await api.getScenario('item-to-item', 'my-case-scenario');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -59,7 +57,7 @@ describe('SCENARIOS TESTS', () => {
                 "else": "scenario2"
             }
         }
-        fetchMock.putOnce(opts.host + '/v1/scenarios/item-to-item/my-case-scenario/', expectedResponse);
+        globalThis.fetch.putOnce(opts.host + '/v1/scenarios/item-to-item/my-case-scenario/', expectedResponse);
         const current = await api.createOrReplaceScenario('item-to-item', 'my-case-scenario', scenario);
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -67,7 +65,7 @@ describe('SCENARIOS TESTS', () => {
 
     test('deleteScenario', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/scenarios/item-to-item/my-case-scenario/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/scenarios/item-to-item/my-case-scenario/', expectedResponse);
         const current = await api.deleteScenario('item-to-item', 'my-case-scenario');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -123,7 +121,7 @@ describe('SCENARIOS TESTS', () => {
                 }
             ]
         }
-        fetchMock.getOnce(opts.host + '/v1/scenarios/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/scenarios/', expectedResponse);
         const current = await api.getAllScenarios();
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -133,7 +131,7 @@ describe('SCENARIOS TESTS', () => {
         const expectedResponse = {
             "name": "scenario_109"
         }
-        fetchMock.getOnce(opts.host + '/v1/scenarios-default/item-to-item/', expectedResponse);
+        globalThis.fetch.getOnce(opts.host + '/v1/scenarios-default/item-to-item/', expectedResponse);
         const current = await api.getDefaultScenario('item-to-item');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -141,7 +139,7 @@ describe('SCENARIOS TESTS', () => {
 
     test('setDefaultScenario', async () => {
         const expectedResponse = {}
-        fetchMock.patchOnce(opts.host + '/v1/scenarios-default/item-to-item/', expectedResponse);
+        globalThis.fetch.patchOnce(opts.host + '/v1/scenarios-default/item-to-item/', expectedResponse);
         const current = await api.setDefaultScenario('item-to-item', 'my-case-scenario');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();
@@ -149,7 +147,7 @@ describe('SCENARIOS TESTS', () => {
 
     test('unsetDefaultScenario', async () => {
         const expectedResponse = {}
-        fetchMock.deleteOnce(opts.host + '/v1/scenarios-default/item-to-item/', expectedResponse);
+        globalThis.fetch.deleteOnce(opts.host + '/v1/scenarios-default/item-to-item/', expectedResponse);
         const current = await api.unsetDefaultScenario('item-to-item', 'my-case-scenario');
         expect(current).toEqual(expectedResponse);
         expect(current).toMatchSnapshot();

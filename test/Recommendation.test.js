@@ -1,7 +1,6 @@
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // RECOMMENDATIONS ENDPOINTS
 describe('RECOMMENDATIONS TESTS', () => {
@@ -20,7 +19,7 @@ describe('RECOMMENDATIONS TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('getRecommendationsItemToItems', async () => {
         const expectedResponse = {
@@ -41,7 +40,7 @@ describe('RECOMMENDATIONS TESTS', () => {
             filters: utils.getFormattedFiltersArray(filters)
         }
         let path = '/v1/recommendation/items/c3391d83-553b-40e7-818e-fcf658ec397d/items/' + utils.convertToQueryString(queryParams);
-        fetchMock.getOnce(opts.host + path, expectedResponse);
+        globalThis.fetch.getOnce(opts.host + path, expectedResponse);
         const opts_params = {
             amt: amt,
             cursor: "Q21vU1pHb1FjSEp...",
@@ -76,7 +75,7 @@ describe('RECOMMENDATIONS TESTS', () => {
             { "property_name": "poster", "op": "notempty" },
         ]
         const excludeRatedItems = true;
-        fetchMock.postOnce(opts.host + '/v1/recommendation/sessions/items/', expectedResponse);
+        globalThis.fetch.postOnce(opts.host + '/v1/recommendation/sessions/items/', expectedResponse);
         const opts_params = {
             amt: amt,
             cursor: "Q21vU1pHb1FjSEp...",
@@ -120,7 +119,7 @@ describe('RECOMMENDATIONS TESTS', () => {
             user_properties: userProperties
         }
         let path = `/v1/recommendation/users/${userId}/items/` + utils.convertToQueryString(queryParams);
-        fetchMock.getOnce(opts.host + path, expectedResponse);
+        globalThis.fetch.getOnce(opts.host + path, expectedResponse);
         const opts_params = {
             amt: amt,
             cursor: "Q21vU1pHb1FjSEp...",
