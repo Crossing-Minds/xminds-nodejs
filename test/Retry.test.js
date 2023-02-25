@@ -1,7 +1,6 @@
 const { ApiClient } = require("../lib/ApiClient");
 const utils = require('../lib/Utils');
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // USER-DATA-PROPERTIES ENDPOINTS
 describe('RETRY FEATURE TESTS', () => {
@@ -20,7 +19,7 @@ describe('RETRY FEATURE TESTS', () => {
             "user_id_type": "uint32"
         }
     }
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
 
     test('Must retry 3 times since the opts.retry parameter is not provided, then it uses default', async () => {
         const responseErr = { "error_code": "2", "error_name": "TooManyRequests", "message": "The amount of requests exceeds the limit of your subscription.", 
@@ -32,20 +31,20 @@ describe('RETRY FEATURE TESTS', () => {
                 price: 9.99
             }
         }
-        fetchMock.put(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/c3391d83-553b-40e7-818e-fcf658ec397d/', { body: responseErr, status: 429 });
+        globalThis.fetch.put(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/ratings/c3391d83-553b-40e7-818e-fcf658ec397d/', { body: responseErr, status: 429 });
         // Must retry 3 times (Default)
         var retryOpts = {}
         const current = await api.createOrUpdateRating('123e4567-e89b-12d3-a456-426614174000', 'c3391d83-553b-40e7-818e-fcf658ec397d', 8.5, 1588812345, retryOpts)
             .catch(err => {
                 expect(err.message).toEqual('The amount of requests exceeds the limit of your subscription.');
             });
-        // fetchMock.mock.calls includes call to POST (loginRefreshToken)
-        expect(fetchMock.mock.calls.length - 1).toBe(4); // Must be called 3 times
+        // globalThis.fetchMock.mock.calls includes call to POST (loginRefreshToken)
+        expect(globalThis.fetch.mock.calls.length - 1).toBe(4); // Must be called 3 times
         expect(current).toMatchSnapshot();
     }, 5000);
 
     test('Must retry 2 times since the maxRetries param is equal to 2', async () => {
-        fetchMock.mockReset();
+        globalThis.fetch.mockReset();
         const responseErr = { "error_code": "2", "error_name": "TooManyRequests", "message": "The amount of requests exceeds the limit of your subscription.", 
             "error_data": { "name": "RATE_LIMIT_OVERFLOW" } }
         const item = {
@@ -55,7 +54,7 @@ describe('RETRY FEATURE TESTS', () => {
                 price: 9.99
             }
         }
-        fetchMock.put(opts.host + '/v1/items/123e4567-e89b-12d3-a456-426614174000/', { body: responseErr, status: 429 });
+        globalThis.fetch.put(opts.host + '/v1/items/123e4567-e89b-12d3-a456-426614174000/', { body: responseErr, status: 429 });
         // Must retry 2 times
         var retryOpts = {
             retry: {
@@ -68,13 +67,13 @@ describe('RETRY FEATURE TESTS', () => {
             .catch(err => {
                 expect(err.message).toEqual('The amount of requests exceeds the limit of your subscription.');
             });
-        // fetchMock.mock.calls includes call to POST (loginRefreshToken)
-        expect(fetchMock.mock.calls.length).toBe(3); // Must be called 3 times
+        // globalThis.fetchMock.mock.calls includes call to POST (loginRefreshToken)
+        expect(globalThis.fetch.mock.calls.length).toBe(3); // Must be called 3 times
         expect(current).toMatchSnapshot();
     }, 5000);
 
     test('Must not retry since the maxRetries parameter is equal to 0', async () => {
-        fetchMock.mockReset();
+        globalThis.fetch.mockReset();
         const responseErr = { "error_code": "2", "error_name": "TooManyRequests", "message": "The amount of requests exceeds the limit of your subscription.", 
             "error_data": { "name": "RATE_LIMIT_OVERFLOW" } }
         const user = {
@@ -83,7 +82,7 @@ describe('RETRY FEATURE TESTS', () => {
                 age: 25
             }
         }
-        fetchMock.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', { body: responseErr, status: 429 });
+        globalThis.fetch.putOnce(opts.host + '/v1/users/123e4567-e89b-12d3-a456-426614174000/', { body: responseErr, status: 429 });
         // Must not retry
         var retryOpts = {
             retry: {
@@ -96,7 +95,7 @@ describe('RETRY FEATURE TESTS', () => {
             .catch(err => {
                 expect(err.message).toEqual('The amount of requests exceeds the limit of your subscription.');
             });
-        expect(fetchMock.mock.calls.length).toBe(1); // Must be called 1 time only
+        expect(globalThis.fetch.mock.calls.length).toBe(1); // Must be called 1 time only
         expect(current).toMatchSnapshot();
     }, 5000);
 

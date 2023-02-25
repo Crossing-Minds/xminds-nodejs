@@ -1,6 +1,5 @@
 const { ApiClient } = require("../lib/ApiClient");
-jest.mock('isomorphic-fetch', () => require('fetch-mock-jest').sandbox());
-const fetchMock = require('isomorphic-fetch');
+require('./mockFetch')();
 
 // LOGIN REFRESH TOKEN 
 describe('LOGIN REFRESH TOKEN TEST', () => {
@@ -44,20 +43,20 @@ describe('LOGIN REFRESH TOKEN TEST', () => {
   }
 
   test('Should generate a new JWTToken using the cached Refresh Token and execute again the initial method', async () => {
-    // Mock the fetch() get method for first call with an error response when called
-    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', responseErr);
-    // Mock the fetch() post method to return a correct response when called
-    fetchMock.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
-    // Mock the fetch() get method for second call with a correct response when called
-    fetchMock.getOnce(opts.host + '/v1/databases/?amt=64&page=1', expectedResponseOK, { overwriteRoutes: true });
+    // Mock the globalThis.fetch() get method for first call with an error response when called
+    globalThis.fetch.getOnce(opts.host + '/v1/databases/?amt=64&page=1', responseErr);
+    // Mock the globalThis.fetch() post method to return a correct response when called
+    globalThis.fetch.post(opts.host + '/v1/login/refresh-token/', loginRefreshTokenResponse);
+    // Mock the globalThis.fetch() get method for second call with a correct response when called
+    globalThis.fetch.getOnce(opts.host + '/v1/databases/?amt=64&page=1', expectedResponseOK, { overwriteRoutes: true });
 
     const current = await api.listAllDatabases(64, 1);
     // Two calls must be made
-    expect((fetchMock._calls.length)).toEqual(2);
+    expect((globalThis.fetch._calls.length)).toEqual(2);
     // The second call should be to loginRefreshToken endpoint
-    expect((fetchMock._calls[0].url)).toEqual(opts.host + '/v1/login/refresh-token/');
+    expect((globalThis.fetch._calls[0].url)).toEqual(opts.host + '/v1/login/refresh-token/');
     // The third call should be to listAllDatabases endpoint
-    expect((fetchMock._calls[1].url)).toEqual(opts.host + '/v1/databases/?amt=64&page=1');
+    expect((globalThis.fetch._calls[1].url)).toEqual(opts.host + '/v1/databases/?amt=64&page=1');
     // The final response must be as expected
     expect(current).toEqual(expectedResponseOK);
     expect(current).toMatchSnapshot();
